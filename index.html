@@ -77,18 +77,6 @@ body {
   height: auto;
 }
 
-/* sync indicator */
-.sync-dot {
-  width: 7px; height: 7px;
-  border-radius: 50%;
-  background: var(--accent);
-  opacity: 0;
-  transition: opacity 0.3s;
-  flex-shrink: 0;
-}
-.sync-dot.pulse { animation: syncpulse 0.8s ease; }
-@keyframes syncpulse { 0%{opacity:1;transform:scale(1)} 50%{opacity:1;transform:scale(1.4)} 100%{opacity:0;transform:scale(1)} }
-
 .topbar-right { display:flex; align-items:center; gap:8px; }
 
 /* ── PAGES ── */
@@ -344,24 +332,6 @@ body {
 .modal-btn.danger  { background:var(--red); color:white; }
 .modal-btn:active  { opacity:0.85; }
 
-/* ── LOADING ── */
-.loading-overlay {
-  position:fixed; inset:0;
-  background:var(--bg);
-  display:flex; align-items:center; justify-content:center;
-  z-index:200;
-  transition:opacity 0.4s;
-}
-.loading-overlay.done { opacity:0; pointer-events:none; }
-.loading-spinner {
-  width:32px; height:32px;
-  border:3px solid var(--border);
-  border-top-color:var(--accent);
-  border-radius:50%;
-  animation:spin 0.7s linear infinite;
-}
-@keyframes spin { to{transform:rotate(360deg)} }
-
 /* ── TOAST ── */
 .toast {
   position:fixed;
@@ -378,18 +348,12 @@ body {
 </head>
 <body>
 
-<!-- LOADING -->
-<div class="loading-overlay" id="loader">
-  <div class="loading-spinner"></div>
-</div>
-
 <!-- TOP BAR -->
 <div class="topbar">
   <div class="logo">
     <span class="logo-ia">xa</span>rajat
   </div>
   <div class="topbar-right">
-    <div class="sync-dot" id="sync-dot"></div>
     <span id="clock-disp">--:--</span>
   </div>
 </div>
@@ -575,14 +539,6 @@ body {
 <div class="toast" id="toast"></div>
 
 <script>
-// ─────────────────────────────────────────
-// CONFIG — serverga deploy qilgandan so'ng
-// shu URL-ni o'zgartiring:
-// const API = 'https://your-app.onrender.com';
-// Local test uchun:
-const API = window.location.origin;
-// ─────────────────────────────────────────
-
 const CATS = {
   oziq:      { label:'Oziq-ovqat', ico:'🌾', ic:'ic-oziq',      bar:'bar-oziq'      },
   transport: { label:'Transport',  ico:'🚌', ic:'ic-transport', bar:'bar-transport' },
@@ -613,47 +569,17 @@ function dateLabel(iso) {
   return new Date(iso).toLocaleDateString('uz-UZ', {day:'numeric', month:'short'});
 }
 
-function syncPulse() {
-  const d = document.getElementById('sync-dot');
-  d.classList.remove('pulse');
-  void d.offsetWidth;
-  d.classList.add('pulse');
-}
-
-// ── API CALLS ─────────────────────────────
-async function apiFetch(path, opts={}) {
-  try {
-    const r = await fetch(API + path, {
-      headers: { 'Content-Type':'application/json' },
-      ...opts,
-      body: opts.body ? JSON.stringify(opts.body) : undefined,
-    });
-    return await r.json();
-  } catch(e) {
-    // Fallback to localStorage if server not available
-    return null;
-  }
-}
-
-async function loadData() {
-  const data = await apiFetch('/api/data');
-  if (data) {
-    entries = data.entries || [];
-    budget  = data.budget  || 0;
-    syncPulse();
-  } else {
-    // localStorage fallback
-    entries = JSON.parse(localStorage.getItem('x_entries3') || '[]');
-    budget  = parseFloat(localStorage.getItem('x_budget3')  || '0');
-  }
-  if (budget) document.getElementById('f-budget').value = budget;
-  renderDash();
-  document.getElementById('loader').classList.add('done');
-}
-
+// ── STORAGE ───────────────────────────────
 function saveLocal() {
   localStorage.setItem('x_entries3', JSON.stringify(entries));
   localStorage.setItem('x_budget3',  budget);
+}
+
+function loadLocal() {
+  entries = JSON.parse(localStorage.getItem('x_entries3') || '[]');
+  budget  = parseFloat(localStorage.getItem('x_budget3')  || '0');
+  if (budget) document.getElementById('f-budget').value = budget;
+  renderDash();
 }
 
 // ── NAV ───────────────────────────────────
@@ -677,25 +603,18 @@ document.querySelectorAll('.cat-item').forEach(el => {
 });
 
 // ── ADD ENTRY ─────────────────────────────
-async function addEntry() {
+function addEntry() {
   const desc   = document.getElementById('f-desc').value.trim();
   const amount = parseFloat(document.getElementById('f-amount').value);
   if (!desc)               { toast('Tavsif kiriting'); return; }
   if (!amount || amount<=0){ toast("To'g'ri miqdor kiriting"); return; }
 
-  const entry = { id: Date.now(), desc, amount, cat: selCat, date: today() };
-
-  // Optimistic update
-  entries.unshift(entry);
+  entries.unshift({ id: Date.now(), desc, amount, cat: selCat, date: today() });
   saveLocal();
   document.getElementById('f-desc').value   = '';
   document.getElementById('f-amount').value = '';
   renderDash();
   toast("✓ Xarajat qo'shildi");
-
-  // Sync to server
-  const res = await apiFetch('/api/entries', { method:'POST', body: entry });
-  if (res) { syncPulse(); } else { toast('⚠ Serverga ulanilmadi, lokal saqlandi'); }
 
   const total = entries.reduce((s,e)=>s+e.amount,0);
   if (budget && total > budget) setTimeout(()=>toast('⚠ Byudjet oshib ketdi!'),2400);
@@ -706,7 +625,7 @@ function getTimePin() {
   const n = new Date();
   const h = String(n.getHours()).padStart(2,'0');
   const m = String(n.getMinutes()).padStart(2,'0');
-  return h + m; // e.g. "1505"
+  return h + m;
 }
 
 function openPinModal() {
@@ -719,7 +638,7 @@ function openPinModal() {
   setTimeout(()=>document.getElementById('pin-input').focus(), 300);
 }
 
-async function confirmPin() {
+function confirmPin() {
   const entered = document.getElementById('pin-input').value.trim();
   const correct = getTimePin();
   if (entered !== correct) {
@@ -734,10 +653,6 @@ async function confirmPin() {
   closeModal('modal-pin');
   toast('✓ Byudjet saqlandi');
   renderDash();
-
-  // Sync
-  const res = await apiFetch('/api/budget', { method:'PUT', body:{ budget, pin: entered } });
-  if (res) syncPulse();
 }
 
 // ── DELETE ────────────────────────────────
@@ -750,19 +665,15 @@ function openDeleteConfirm(id) {
   openModal('modal-del');
 }
 
-async function confirmDelete() {
+function confirmDelete() {
   if (pendingDeleteId === null) return;
   const id = pendingDeleteId;
   pendingDeleteId = null;
   closeModal('modal-del');
-
   entries = entries.filter(e=>e.id!==id);
   saveLocal();
   renderDash(); renderHist(); renderStats();
   toast("O'chirildi");
-
-  const res = await apiFetch('/api/entries/'+id, { method:'DELETE' });
-  if (res) syncPulse();
 }
 
 function openClearConfirm() {
@@ -770,27 +681,22 @@ function openClearConfirm() {
   openModal('modal-clear');
 }
 
-async function confirmClear() {
+function confirmClear() {
   closeModal('modal-clear');
   entries = [];
   saveLocal();
   renderDash(); renderHist(); renderStats();
   toast('Tozalandi');
-
-  const res = await apiFetch('/api/entries', { method:'DELETE' });
-  if (res) syncPulse();
 }
 
 // ── MODAL HELPERS ─────────────────────────
 function openModal(id)  { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
-// close on backdrop click
 document.querySelectorAll('.modal-backdrop').forEach(el => {
   el.addEventListener('click', e => { if (e.target===el) closeModal(el.id); });
 });
 
-// pin enter key
 document.getElementById('pin-input').addEventListener('keydown', e => {
   if (e.key==='Enter') confirmPin();
 });
@@ -901,7 +807,6 @@ function tick() {
   const n=new Date();
   const t=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');
   document.getElementById('clock-disp').textContent=t;
-  // Update PIN hint if modal open
   if (document.getElementById('modal-pin').classList.contains('open')) {
     document.getElementById('pin-show').textContent = getTimePin();
   }
@@ -915,8 +820,9 @@ document.addEventListener('keydown', e=>{
 });
 
 // ── INIT ──────────────────────────────────
-loadData();
+loadLocal();
 </script>
+
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
@@ -925,5 +831,4 @@ loadData();
   }
 </script>
 </body>
-
 </html>
