@@ -290,10 +290,14 @@ body {
   border-radius:13px;
   padding:14px;
   display:flex;
+  cursor: pointer;
   align-items:center;
   justify-content:space-between;
   box-shadow:0 1px 5px rgba(44,40,37,0.05);
 }
+
+.setting-item:active { transform:scale(0.98); opacity:0.88; }
+
 .setting-info { flex:1; }
 .setting-name { font-size:14px; font-weight:700; color:var(--text); }
 .setting-desc { font-size:11px; color:var(--text3); margin-top:2px; }
@@ -549,7 +553,7 @@ body {
       <canvas id="monthChart" class="chart-canvas"></canvas>
     </div>
 
-    <div class="card">
+    <div class="card" style="display: none;">
       <div class="sec-title">Byudjet sozlash</div>
       <div style="display:flex;gap:8px;align-items:center;">
         <div style="flex:1;">
@@ -563,6 +567,13 @@ body {
 
     <div class="settings-list">
       <div class="sec-title">Sozlamalar</div>
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-name" onclick="openBudgetChange()">Byudjet sozlash</div>
+          <div class="setting-desc" onclick="openBudgetChange()">Oylik daromadingizni kiriting</div>
+        </div>
+        <button class="setting-action" onclick="openBudgetChange()" style="display: none;">O'zgartirish</button>
+      </div>
       <div class="setting-item">
         <div class="setting-info">
           <div class="setting-name">Bildirishnomalar</div>
