@@ -170,6 +170,93 @@ body {
 /* ── SEC TITLE ── */
 .sec-title { font-size:10px; font-weight:800; letter-spacing:1.2px; color:var(--text3); text-transform:uppercase; margin-bottom:8px; }
 
+/* ── TOGGLE SWITCH ── */
+.toggle-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 12px;
+  background: #F5F2EE;
+  border-radius: 12px;
+  padding: 4px;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+}
+.toggle-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: #7C8499;
+  text-align: center;
+  padding: 10px 24px;
+  width: 150px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s;
+  user-select: none;
+}
+.toggle-label.active { 
+  color: white; 
+  background: #EF5A6F;
+}
+.toggle-label.active.income-active {
+  background: var(--accent);
+}
+
+/* ── PROGRESS BAR (Boshqa page) ── */
+.balance-prog-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow);
+}
+.balance-prog-title {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+}
+.balance-prog-bar-wrap {
+  position: relative;
+  height: 32px;
+  background: var(--accent);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.balance-prog-expense {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  background: var(--red);
+  transition: width 0.5s ease;
+}
+.balance-prog-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+.balance-prog-label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.balance-prog-label-name {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text3);
+  text-transform: uppercase;
+}
+.balance-prog-label-val {
+  font-family: 'DM Mono', monospace;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
 /* ── HISTORY ── */
 .hist-list { display:flex; flex-direction:column; gap:7px; position:relative; }
 .entry-card {
@@ -179,6 +266,8 @@ body {
   position:relative;
 }
 .entry-card.clickable { cursor:pointer; }
+.entry-card.income { border-left: 3px solid var(--accent); }
+.entry-card.expense { border-left: 3px solid var(--red); }
 
 .entry-ico { width:38px; height:38px; border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:17px; flex-shrink:0; }
 .entry-info { flex:1; min-width:0; }
@@ -186,29 +275,30 @@ body {
 .entry-meta { font-size:10px; color:var(--text3); margin-top:2px; font-weight:600; }
 .entry-right { display:flex; flex-direction:column; align-items:flex-end; gap:5px; flex-shrink:0; }
 .entry-amt { font-family:'DM Mono',monospace; font-size:14px; color:var(--text); }
-.del-btn { background:none; border:none; cursor:pointer; font-size:13px; color:var(--text3); padding:1px; transition:color 0.15s; }
-.del-btn:hover { color:var(--red); }
+.entry-amt.income { color: var(--accent); }
+.entry-amt.expense { color: var(--red); }
 
 /* entry context menu */
 .entry-context {
   position:absolute;
-  right:10px; top:50%;
-  transform:translateY(-50%);
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: -8px;
   background:var(--surface);
   border:1.5px solid var(--border);
   border-radius:10px;
-  box-shadow:var(--shadow);
+  box-shadow:0 4px 12px rgba(0,0,0,0.15);
   display:flex;
   gap:4px;
   padding:4px;
-  z-index:5;
+  z-index:6;
 }
 .entry-context-btn {
   background:var(--bg);
   border:none;
-  padding:6px 12px;
+  padding:8px 16px;
   border-radius:8px;
-  font-size:11px;
+  font-size:12px;
   font-weight:800;
   cursor:pointer;
   transition:all 0.15s;
@@ -239,6 +329,39 @@ body {
   border-color:var(--accent);
   background:var(--accent-l);
   color:var(--accent);
+}
+
+.filter-type-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.filter-type-btn {
+  flex: 1;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 8px;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+/* Sarlavhalar grid ichida butun qatorni egallashi uchun */
+#filter-cat-grid div:not(.cat-item) {
+    grid-column: span 3;
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--text3);
+    text-transform: uppercase;
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+.filter-type-btn.sel {
+  border-color: var(--accent);
+  background: var(--accent-l);
+  color: var(--accent);
 }
 
 .empty-msg { text-align:center; padding:24px 16px; color:var(--text3); font-size:13px; font-weight:600; }
@@ -318,26 +441,7 @@ body {
   cursor:not-allowed;
 }
 
-/* ── CHART (diagramma) ── */
-.chart-card {
-  background:var(--surface);
-  border-radius:var(--radius);
-  padding:16px;
-  box-shadow:var(--shadow);
-}
-.chart-title {
-  font-size:12px;
-  font-weight:800;
-  color:var(--text);
-  margin-bottom:10px;
-  letter-spacing:0.5px;
-}
-.chart-canvas {
-  width:100%;
-  height:180px;
-}
-
-/* CAT colors */
+/* CAT colors - Expense */
 .ic-oziq      { background:#E8F5E9; }
 .ic-transport { background:#E3F2FD; }
 .ic-kommunal  { background:#FFF8E1; }
@@ -347,15 +451,14 @@ body {
 .ic-taʼlim    { background:#FFF3E0; }
 .ic-koʼngil   { background:#F3E5F5; }
 .ic-boshqa    { background:#ECEFF1; }
-.bar-oziq      { background:#4CAF50; }
-.bar-transport { background:#2196F3; }
-.bar-kommunal  { background:#FFC107; }
-.bar-soglik    { background:#E91E63; }
-.bar-kiyim     { background:#9C27B0; }
-.bar-uy        { background:#00897B; }
-.bar-taʼlim    { background:#FB8C00; }
-.bar-koʼngil   { background:#7B1FA2; }
-.bar-boshqa    { background:#90A4AE; }
+
+/* CAT colors - Income */
+.ic-maosh     { background:#E8F5E9; }
+.ic-bonus     { background:#FFF3E0; }
+.ic-biznes    { background:#E3F2FD; }
+.ic-investitsiya { background:#F3E5F5; }
+.ic-sovgʼa    { background:#FCE4EC; }
+.ic-boshqa-daromad { background:#ECEFF1; }
 
 /* ── MODAL (PIN / CONFIRM) ── */
 .modal-backdrop {
@@ -386,27 +489,6 @@ body {
 .modal-title { font-size:16px; font-weight:800; text-align:center; }
 .modal-sub { font-size:13px; color:var(--text3); text-align:center; font-weight:600; line-height:1.4; }
 
-.pin-hint {
-  font-size:11px; color:var(--text3); text-align:center; font-weight:600;
-  background:var(--bg); border-radius:10px; padding:8px 12px;
-}
-.pin-hint span { color:var(--accent); font-family:'DM Mono',monospace; font-size:13px; font-weight:500; }
-
-.pin-input {
-  width:100%; border:1.5px solid var(--border); border-radius:11px;
-  padding:13px; text-align:center;
-  font-family:'DM Mono',monospace; font-size:24px; font-weight:500;
-  color:var(--text); background:var(--bg); outline:none;
-  letter-spacing:8px;
-  transition:border-color 0.15s;
-}
-.pin-input:focus { border-color:var(--accent); background:white; }
-.pin-input.err { border-color:var(--red); animation:shake 0.3s ease; }
-
-@keyframes shake {
-  0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)}
-}
-
 .modal-btns { display:flex; gap:8px; }
 .modal-btn {
   flex:1; padding:13px; border-radius:11px; border:none;
@@ -430,6 +512,20 @@ body {
   white-space:nowrap; pointer-events:none;
 }
 .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+/* ── CAT SECTION HEADER ── */
+.cat-section-header {
+  font-size:11px;
+  font-weight:800;
+  color:var(--text3);
+  text-transform:uppercase;
+  letter-spacing:1px;
+  margin-top:12px;
+  margin-bottom:6px;
+}
+.cat-section-header:first-child {
+  margin-top:0;
+}
 </style>
 </head>
 <body>
@@ -450,24 +546,17 @@ body {
   <!-- DASHBOARD -->
   <div class="page active" id="page-dash">
     <div class="hero-card">
-      <div class="hero-label">Jami xarajat</div>
-      <div class="hero-amount" id="h-total">0 UZS</div>
+      <div class="hero-label">Balans</div>
+      <div class="hero-amount" id="h-balance">0 UZS</div>
       <div class="hero-row">
         <div class="hero-stat">
-          <div class="hero-stat-val" id="h-remain">—</div>
-          <div class="hero-stat-lbl">Qoldi</div>
+          <div class="hero-stat-val" id="h-income">0</div>
+          <div class="hero-stat-lbl">Daromad</div>
         </div>
         <div class="hero-stat">
-          <div class="hero-stat-val" id="h-count">0</div>
-          <div class="hero-stat-lbl">Operatsiya</div>
+          <div class="hero-stat-val" id="h-expense">0</div>
+          <div class="hero-stat-lbl">Xarajat</div>
         </div>
-      </div>
-      <div class="prog-wrap">
-        <div class="prog-meta">
-          <span id="h-prog-lbl">Byudjet belgilanmagan</span>
-          <span id="h-prog-pct"></span>
-        </div>
-        <div class="prog-track"><div class="prog-fill" id="h-prog-fill" style="width:0%"></div></div>
       </div>
     </div>
 
@@ -485,7 +574,7 @@ body {
     </div>
 
     <div>
-      <div class="sec-title">So'nggi xarajatlar</div>
+      <div class="sec-title">So'nggi operatsiyalar</div>
       <div class="hist-list" id="dash-recent"></div>
     </div>
   </div>
@@ -493,10 +582,15 @@ body {
   <!-- QO'SHISH -->
   <div class="page" id="page-add">
     <div class="card add-form">
-      <div class="sec-title">Yangi xarajat</div>
+      <div class="toggle-wrapper">
+        <span class="toggle-label" id="toggle-label-expense" onclick="setEntryType('expense')">Expense</span>
+        <span class="toggle-label active income-active" id="toggle-label-income" onclick="setEntryType('income')">Income</span>
+      </div>
+      
+      <div class="sec-title" id="add-form-title">Yangi daromad</div>
       <div class="f-row">
         <div class="f-lbl">Tavsif</div>
-        <input class="f-input" type="text" id="f-desc" placeholder="Masalan: non va sut" maxlength="60"/>
+        <input class="f-input" type="text" id="f-desc" placeholder="masalan: oylik maosh" maxlength="60" style="text-transform: lowercase;"/>
       </div>
       <div class="f-row">
         <div class="f-lbl">Miqdor</div>
@@ -508,15 +602,7 @@ body {
       <div class="f-row">
         <div class="f-lbl">Kategoriya</div>
         <div class="cat-grid" id="cat-grid">
-          <div class="cat-item sel" data-cat="oziq"><span class="ico">🌾</span>Oziq-ovqat</div>
-          <div class="cat-item" data-cat="transport"><span class="ico">🚌</span>Transport</div>
-          <div class="cat-item" data-cat="kommunal"><span class="ico">💡</span>Kommunal</div>
-          <div class="cat-item" data-cat="soglik"><span class="ico">💊</span>Sog'liq</div>
-          <div class="cat-item" data-cat="kiyim"><span class="ico">👔</span>Kiyim</div>
-          <div class="cat-item" data-cat="uy"><span class="ico">🏠</span>Uy-joy</div>
-          <div class="cat-item" data-cat="taʼlim"><span class="ico">📚</span>Ta'lim</div>
-          <div class="cat-item" data-cat="koʼngil"><span class="ico">🎮</span>Ko'ngil</div>
-          <div class="cat-item" data-cat="boshqa"><span class="ico">📦</span>Boshqa</div>
+          <!-- Populated dynamically -->
         </div>
       </div>
       <button class="add-btn" onclick="addEntry()">Qo'shish</button>
@@ -526,17 +612,22 @@ body {
   <!-- TARIX -->
   <div class="page" id="page-hist">
     <div style="display:flex;align-items:center;justify-content:space-between;">
-      <div class="sec-title" style="margin-bottom:0">Barcha xarajatlar</div>
+      <div class="sec-title" style="margin-bottom:0">Barcha operatsiyalar</div>
       <button onclick="openClearConfirm()" style="font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;color:var(--red);background:none;border:none;cursor:pointer;">Tozalash</button>
     </div>
     <div class="filter-row">
       <button class="filter-btn" id="filter-date-btn" onclick="toggleDateFilter()">📅 Kun bo'yicha</button>
       <button class="filter-btn" id="filter-cat-btn" onclick="openCatFilter()">📂 Kategoriya</button>
     </div>
+    <div class="filter-type-row">
+      <button class="filter-type-btn sel" id="filter-type-all" onclick="setTypeFilter('all')">Hammasi</button>
+      <button class="filter-type-btn" id="filter-type-income" onclick="setTypeFilter('income')">Daromad</button>
+      <button class="filter-type-btn" id="filter-type-expense" onclick="setTypeFilter('expense')">Xarajat</button>
+    </div>
     <div id="date-filter-section" style="display:none; margin-top:8px;">
       <div style="display:flex; gap:6px; margin-bottom:8px;">
-        <input type="date" id="filter-date-start" class="f-input" style="flex:1; padding:8px; font-size:12px;"/>
-        <input type="date" id="filter-date-end" class="f-input" style="flex:1; padding:8px; font-size:12px;"/>
+        <input type="date" id="filter-date-start" class="f-input" style="flex:1; padding:10px 8px; font-size:13px; font-weight:600;"/>
+        <input type="date" id="filter-date-end" class="f-input" style="flex:1; padding:10px 8px; font-size:13px; font-weight:600;"/>
       </div>
       <div style="display:flex; gap:6px;">
         <button class="modal-btn cancel" style="flex:1; font-size:12px; padding:8px;" onclick="clearDateFilter()">Tozalash</button>
@@ -546,22 +637,22 @@ body {
     <div class="hist-list" id="hist-list"></div>
   </div>
 
-  <!-- BOSHQA (settings + budget) -->
+  <!-- BOSHQA (settings) -->
   <div class="page" id="page-other">
-    <div class="chart-card">
-      <div class="chart-title">Oylik diagramma</div>
-      <canvas id="monthChart" class="chart-canvas"></canvas>
-    </div>
-
-    <div class="card" style="display: none;">
-      <div class="sec-title">Byudjet sozlash</div>
-      <div style="display:flex;gap:8px;align-items:center;">
-        <div style="flex:1;">
-          <div style="font-size:11px;color:var(--text3);font-weight:700;margin-bottom:4px;">
-            Oylik byudjet: <span style="color:var(--accent);font-family:'DM Mono',monospace;font-size:16px;" id="budget-display">—</span> UZS
-          </div>
+    <div class="balance-prog-card">
+      <div class="balance-prog-title">Moliyaviy holat</div>
+      <div class="balance-prog-bar-wrap">
+        <div class="balance-prog-expense" id="balance-prog-expense"></div>
+      </div>
+      <div class="balance-prog-labels">
+        <div class="balance-prog-label">
+          <div class="balance-prog-label-name">Balans</div>
+          <div class="balance-prog-label-val" id="balance-income-val" style="color: #4A7C59;">0</div>
         </div>
-        <button class="setting-action" onclick="openBudgetChange()">O'zgartirish</button>
+        <div class="balance-prog-label">
+          <div class="balance-prog-label-name">Xarajat</div>
+          <div class="balance-prog-label-val" id="balance-expense-val" style="color: #C0392B;">0</div>
+        </div>
       </div>
     </div>
 
@@ -569,15 +660,8 @@ body {
       <div class="sec-title">Sozlamalar</div>
       <div class="setting-item">
         <div class="setting-info">
-          <div class="setting-name" onclick="openBudgetChange()">Byudjet sozlash</div>
-          <div class="setting-desc" onclick="openBudgetChange()">Oylik daromadingizni kiriting</div>
-        </div>
-        <button class="setting-action" onclick="openBudgetChange()" style="display: none;">O'zgartirish</button>
-      </div>
-      <div class="setting-item">
-        <div class="setting-info">
           <div class="setting-name">Bildirishnomalar</div>
-          <div class="setting-desc">Byudjet tugaganda ogohlantir</div>
+          <div class="setting-desc">Balans manfiy bo'lganda ogohlantir</div>
         </div>
         <button class="setting-action disabled">Tez orada</button>
       </div>
@@ -620,43 +704,11 @@ body {
   </button>
 </nav>
 
-<!-- MODAL: PIN for budget change -->
-<div class="modal-backdrop" id="modal-budget-pin">
-  <div class="modal-sheet">
-    <div class="modal-handle"></div>
-    <div class="modal-title">Tasdiqlash</div>
-    <div class="modal-sub">Oylik byudjetni tahrirlash uchun maxfiy raqamni kiriting.</div>
-    <div class="pin-hint" style="display: none;">Hozirgi kod: <span id="budget-pin-show">----</span></div>
-    <input class="pin-input" type="text" id="budget-pin-input" maxlength="4" placeholder="····" inputmode="numeric" autocomplete="off"/>
-    <div class="modal-btns">
-      <button class="modal-btn cancel" onclick="closeModal('modal-budget-pin')">Bekor</button>
-      <button class="modal-btn confirm" onclick="confirmBudgetPin()">Tasdiqlash</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL: Budget amount input -->
-<div class="modal-backdrop" id="modal-budget-amount">
-  <div class="modal-sheet">
-    <div class="modal-handle"></div>
-    <div class="modal-title">Byudjet kiritish</div>
-    <div class="modal-sub">Oylik byudjet miqdorini kiriting</div>
-    <div class="f-row">
-      <div class="f-lbl">Miqdor (UZS)</div>
-      <input class="f-input" type="number" id="new-budget-input" placeholder="1000000" inputmode="numeric"/>
-    </div>
-    <div class="modal-btns">
-      <button class="modal-btn cancel" onclick="closeModal('modal-budget-amount')">Bekor</button>
-      <button class="modal-btn confirm" onclick="saveBudgetAmount()">Saqlash</button>
-    </div>
-  </div>
-</div>
-
 <!-- MODAL: Edit Entry -->
 <div class="modal-backdrop" id="modal-edit">
   <div class="modal-sheet">
     <div class="modal-handle"></div>
-    <div class="modal-title">Xarajatni tahrirlash</div>
+    <div class="modal-title">Tahrirlash</div>
     <div class="f-row">
       <div class="f-lbl">Miqdor</div>
       <div class="amt-wrap">
@@ -682,7 +734,7 @@ body {
   <div class="modal-sheet">
     <div class="modal-handle"></div>
     <div class="modal-title">O'chirishni tasdiqlang</div>
-    <div class="modal-sub" id="modal-del-desc">Bu xarajatni o'chirmoqchimisiz?</div>
+    <div class="modal-sub" id="modal-del-desc">Bu operatsiyani o'chirmoqchimisiz?</div>
     <div class="modal-btns">
       <button class="modal-btn cancel" onclick="closeModal('modal-del')">Bekor</button>
       <button class="modal-btn danger" onclick="confirmDelete()">O'chirish</button>
@@ -695,7 +747,7 @@ body {
   <div class="modal-sheet">
     <div class="modal-handle"></div>
     <div class="modal-title">Hammasini o'chirish</div>
-    <div class="modal-sub">Barcha xarajatlarni o'chirmoqchimisiz?</div>
+    <div class="modal-sub">Barcha operatsiyalarni o'chirmoqchimisiz?</div>
     <div class="modal-btns">
       <button class="modal-btn cancel" onclick="closeModal('modal-clear')">Bekor</button>
       <button class="modal-btn danger" onclick="confirmClear()">Hammani o'chirish</button>
@@ -705,59 +757,56 @@ body {
 
 <!-- MODAL: Category filter -->
 <div class="modal-backdrop" id="modal-cat-filter">
-  <div class="modal-sheet">
-    <div class="modal-handle"></div>
-    <div class="modal-title">Kategoriya tanlang</div>
-    <div class="cat-grid" id="filter-cat-grid">
-      <!-- populated dynamically -->
-    </div>
-    <div class="modal-btns">
-      <button class="modal-btn cancel" onclick="clearCatFilter()">Tozalash</button>
-      <button class="modal-btn confirm" onclick="closeModal('modal-cat-filter')">Yopish</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL: Month reset confirmation -->
-<div class="modal-backdrop" id="modal-month-reset">
-  <div class="modal-sheet">
-    <div class="modal-handle"></div>
-    <div class="modal-title">Diagramma yangilash</div>
-    <div class="modal-sub">Yangi oy boshlandi. Diagrammani yangilashni xohlaysizmi? Bu harakat o'tgan oy ma'lumotlarini arxivlaydi.</div>
-    <div class="modal-btns">
-      <button class="modal-btn cancel" onclick="skipMonthReset()">Keyinroq</button>
-      <button class="modal-btn confirm" onclick="confirmMonthReset()">Yangilash</button>
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-title">Kategoriya tanlang</div>
+      
+      <div class="cat-grid" id="filter-cat-grid">
+        </div>
+      
+      <div class="modal-btns">
+        <button class="modal-btn cancel" onclick="clearCatFilter()">Tozalash</button>
+        <button class="modal-btn confirm" onclick="closeModal('modal-cat-filter')">Yopish</button>
+      </div>
     </div>
   </div>
-</div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-const CATS = {
-  oziq:      { label:'Oziq-ovqat', ico:'🌾', ic:'ic-oziq',      bar:'bar-oziq'      },
-  transport: { label:'Transport',  ico:'🚌', ic:'ic-transport', bar:'bar-transport' },
-  kommunal:  { label:'Kommunal',   ico:'💡', ic:'ic-kommunal',  bar:'bar-kommunal'  },
-  soglik:    { label:"Sog'liq",    ico:'💊', ic:'ic-soglik',    bar:'bar-soglik'    },
-  kiyim:     { label:'Kiyim',      ico:'👔', ic:'ic-kiyim',     bar:'bar-kiyim'     },
-  uy:        { label:'Uy-joy',     ico:'🏠', ic:'ic-uy',        bar:'bar-uy'        },
-  taʼlim:    { label:"Ta'lim",     ico:'📚', ic:'ic-taʼlim',    bar:'bar-taʼlim'    },
-  koʼngil:   { label:"Ko'ngil",    ico:'🎮', ic:'ic-koʼngil',   bar:'bar-koʼngil'   },
-  boshqa:    { label:'Boshqa',     ico:'📦', ic:'ic-boshqa',    bar:'bar-boshqa'    },
+const EXPENSE_CATS = {
+  oziq:      { label:'Oziq-ovqat', ico:'🌾', ic:'ic-oziq' },
+  transport: { label:'Transport',  ico:'🚌', ic:'ic-transport' },
+  kommunal:  { label:'Kommunal',   ico:'💡', ic:'ic-kommunal' },
+  soglik:    { label:"Sog'liq",    ico:'💊', ic:'ic-soglik' },
+  kiyim:     { label:'Kiyim',      ico:'👔', ic:'ic-kiyim' },
+  uy:        { label:'Uy-joy',     ico:'🏠', ic:'ic-uy' },
+  taʼlim:    { label:"Ta'lim",     ico:'📚', ic:'ic-taʼlim' },
+  koʼngil:   { label:"Ko'ngil",    ico:'🎮', ic:'ic-koʼngil' },
+  boshqa:    { label:'Boshqa',     ico:'📦', ic:'ic-boshqa' },
+};
+
+const INCOME_CATS = {
+  maosh:     { label:'Maosh',       ico:'💰', ic:'ic-maosh' },
+  bonus:     { label:'Bonus',       ico:'🎁', ic:'ic-bonus' },
+  biznes:    { label:'Biznes',      ico:'💼', ic:'ic-biznes' },
+  investitsiya: { label:'Investitsiya', ico:'📈', ic:'ic-investitsiya' },
+  sovgʼa:    { label:"Sovg'a",      ico:'🎉', ic:'ic-sovgʼa' },
+  boshqa:    { label:'Boshqa',      ico:'💵', ic:'ic-boshqa-daromad' },
 };
 
 let entries = [];
-let budget  = 0;
-let selCat  = 'oziq';
+let entryType = 'income'; // 'income' or 'expense'
+let selCat = 'maosh';
 let editingId = null;
 let pendingDeleteId = null;
-let editCat = 'oziq';
+let editCat = 'maosh';
 let filterDateStart = null;
 let filterDateEnd = null;
 let filterCats = new Set();
-let chartResetMonth = null; // tracks when chart was last reset
+let filterType = 'all'; // 'all', 'income', 'expense'
 
-// ── HELPERS ──────────────────────────────
+// ── HELPERS ─────────��────────────────────
 function fmt(n) {
   if (n >= 1000000) return (n/1000000).toFixed(1).replace('.0','') + 'M';
   if (n >= 1000)    return Math.round(n/1000) + 'K';
@@ -773,24 +822,72 @@ function dateLabel(iso) {
   return new Date(iso).toLocaleDateString('uz-UZ', {day:'numeric', month:'short'});
 }
 
-// Format number with spaces: 1000000 → 1 000 000
 function formatInputNumber(val) {
   return val.replace(/\D/g,'').replace(/\B(?=(\d{3})+(?!\d))/g,' ');
 }
 
 // ── STORAGE ───────────────────────────────
 function saveLocal() {
-  localStorage.setItem('x_entries4', JSON.stringify(entries));
-  localStorage.setItem('x_budget4',  budget);
+  localStorage.setItem('x_entries5', JSON.stringify(entries));
 }
 
 function loadLocal() {
-  entries = JSON.parse(localStorage.getItem('x_entries4') || '[]');
-  budget  = parseFloat(localStorage.getItem('x_budget4')  || '0');
-  chartResetMonth = localStorage.getItem('x_chart_reset') || null;
+  entries = JSON.parse(localStorage.getItem('x_entries5') || '[]');
   renderDash();
-  renderChart();
-  checkMonthReset();
+  renderProgressBar();
+}
+
+// ── TOGGLE ENTRY TYPE ─────────────────────
+function setEntryType(type) {
+  entryType = type;
+  
+  const expenseLabel = document.getElementById('toggle-label-expense');
+  const incomeLabel = document.getElementById('toggle-label-income');
+  const formTitle = document.getElementById('add-form-title');
+  const descInput = document.getElementById('f-desc');
+  
+  if (type === 'income') {
+    expenseLabel.classList.remove('active');
+    incomeLabel.classList.add('active', 'income-active');
+    formTitle.textContent = 'Yangi daromad';
+    descInput.placeholder = 'masalan: oylik maosh';
+    selCat = 'maosh';
+  } else {
+    incomeLabel.classList.remove('active', 'income-active');
+    expenseLabel.classList.add('active');
+    formTitle.textContent = 'Yangi xarajat';
+    descInput.placeholder = 'masalan: non va sut';
+    selCat = 'oziq';
+  }
+  
+  renderCategoryGrid();
+}
+
+function renderCategoryGrid() {
+  const grid = document.getElementById('cat-grid');
+  const cats = entryType === 'income' ? INCOME_CATS : EXPENSE_CATS;
+  
+  grid.innerHTML = Object.entries(cats).map(([key, c]) => 
+    `<div class="cat-item ${key===selCat?'sel':''}" data-cat="${key}" onclick="selectCat('${key}')">
+      <span class="ico">${c.ico}</span>${c.label}
+    </div>`
+  ).join('');
+}
+
+function selectCat(cat) {
+  selCat = cat;
+  renderCategoryGrid();
+}
+
+// ── TYPE FILTER ───────────────────────────
+function setTypeFilter(type) {
+  filterType = type;
+  
+  document.getElementById('filter-type-all').classList.toggle('sel', type === 'all');
+  document.getElementById('filter-type-income').classList.toggle('sel', type === 'income');
+  document.getElementById('filter-type-expense').classList.toggle('sel', type === 'expense');
+  
+  renderHist();
 }
 
 // ── NAV ───────────────────────────────────
@@ -801,17 +898,8 @@ function goPage(name, btn) {
   btn.classList.add('active');
   if (name==='dash')  renderDash();
   if (name==='hist')  renderHist();
-  if (name==='other') { renderChart(); updateBudgetDisplay(); }
+  if (name==='other') renderProgressBar();
 }
-
-// ── CAT SELECT (add page) ─────────────────
-document.querySelectorAll('#cat-grid .cat-item').forEach(el => {
-  el.addEventListener('click', () => {
-    document.querySelectorAll('#cat-grid .cat-item').forEach(x=>x.classList.remove('sel'));
-    el.classList.add('sel');
-    selCat = el.dataset.cat;
-  });
-});
 
 // Amount input formatting
 const amtInput = document.getElementById('f-amount');
@@ -827,63 +915,21 @@ function addEntry() {
   if (!desc)               { toast('Tavsif kiriting'); return; }
   if (!amount || amount<=0){ toast("To'g'ri miqdor kiriting"); return; }
 
-  entries.unshift({ id: Date.now(), desc, amount, cat: selCat, date: today() });
+  entries.unshift({ 
+    id: Date.now(), 
+    desc, 
+    amount, 
+    cat: selCat, 
+    type: entryType,
+    date: today() 
+  });
+  
   saveLocal();
   document.getElementById('f-desc').value   = '';
   document.getElementById('f-amount').value = '';
   renderDash();
-  toast("✓ Xarajat qo'shildi");
-
-  const total = entries.reduce((s,e)=>s+e.amount,0);
-  if (budget && total > budget) setTimeout(()=>toast('⚠ Byudjet oshib ketdi!'),2400);
-}
-
-// ── BUDGET ────────────────────────────────
-function getTimePin() {
-  const n = new Date();
-  const h = String(n.getHours()).padStart(2,'0');
-  const m = String(n.getMinutes()).padStart(2,'0');
-  return h + m;
-}
-
-function openBudgetChange() {
-  document.getElementById('budget-pin-show').textContent = getTimePin();
-  document.getElementById('budget-pin-input').value = '';
-  document.getElementById('budget-pin-input').classList.remove('err');
-  openModal('modal-budget-pin');
-  setTimeout(()=>document.getElementById('budget-pin-input').focus(), 300);
-}
-
-function confirmBudgetPin() {
-  const entered = document.getElementById('budget-pin-input').value.trim();
-  const correct = getTimePin();
-  if (entered !== correct) {
-    const inp = document.getElementById('budget-pin-input');
-    inp.classList.add('err');
-    setTimeout(()=>inp.classList.remove('err'), 400);
-    toast("Noto'g'ri kod");
-    return;
-  }
-  closeModal('modal-budget-pin');
-  document.getElementById('new-budget-input').value = budget || '';
-  openModal('modal-budget-amount');
-  setTimeout(()=>document.getElementById('new-budget-input'), 300);
-}
-
-function saveBudgetAmount() {
-  const val = parseFloat(document.getElementById('new-budget-input').value);
-  if (!val || val<=0) { toast("To'g'ri miqdor kiriting"); return; }
-  budget = val;
-  saveLocal();
-  closeModal('modal-budget-amount');
-  toast('✓ Byudjet saqlandi');
-  updateBudgetDisplay();
-  renderDash();
-}
-
-function updateBudgetDisplay() {
-  const el = document.getElementById('budget-display');
-  el.textContent = budget ? fmtFull(budget) : '—';
+  renderProgressBar();
+  toast(entryType === 'income' ? "✓ Daromad qo'shildi" : "✓ Xarajat qo'shildi");
 }
 
 // ── EDIT / DELETE ─────────────────────────
@@ -891,7 +937,6 @@ let longPressTimer;
 let activeContextId = null;
 
 function handleEntryClick(id, event) {
-  // Desktop: single click toggles context
   if (!('ontouchstart' in window)) {
     event.stopPropagation();
     if (activeContextId === id) {
@@ -903,7 +948,6 @@ function handleEntryClick(id, event) {
 }
 
 function handleTouchStart(id) {
-  // Mobile: long press (500ms)
   longPressTimer = setTimeout(() => showContext(id), 500);
 }
 
@@ -916,6 +960,7 @@ function showContext(id) {
   activeContextId = id;
   const card = document.querySelector(`[data-entry-id="${id}"]`);
   if (!card) return;
+  
   const ctx = document.createElement('div');
   ctx.className = 'entry-context';
   ctx.id = 'ctx-' + id;
@@ -939,16 +984,15 @@ function openEditModal(id) {
   document.getElementById('edit-amount').value = formatInputNumber(String(e.amount));
   editCat = e.cat;
   
-  // populate cat grid
+  const cats = e.type === 'income' ? INCOME_CATS : EXPENSE_CATS;
   const grid = document.getElementById('edit-cat-grid');
-  grid.innerHTML = Object.entries(CATS).map(([key, c]) => 
+  grid.innerHTML = Object.entries(cats).map(([key, c]) => 
     `<div class="cat-item ${key===editCat?'sel':''}" data-cat="${key}" onclick="selectEditCat('${key}')">
       <span class="ico">${c.ico}</span>${c.label}
     </div>`
   ).join('');
   
   openModal('modal-edit');
-  setTimeout(()=>document.getElementById('edit-amount').focus(), 300);
 }
 
 function selectEditCat(cat) {
@@ -976,6 +1020,7 @@ function saveEdit() {
   closeModal('modal-edit');
   renderDash();
   renderHist();
+  renderProgressBar();
   toast('✓ Tahrirlandi');
   editingId = null;
 }
@@ -986,7 +1031,7 @@ function openDeleteConfirm(id) {
   const e = entries.find(x=>x.id===id);
   document.getElementById('modal-del-desc').textContent =
     e ? `"${e.desc}" — ${fmtFull(e.amount)} UZS ni o'chirmoqchimisiz?`
-      : "Bu xarajatni o'chirmoqchimisiz?";
+      : "Bu operatsiyani o'chirmoqchimisiz?";
   openModal('modal-del');
 }
 
@@ -997,7 +1042,9 @@ function confirmDelete() {
   closeModal('modal-del');
   entries = entries.filter(e=>e.id!==id);
   saveLocal();
-  renderDash(); renderHist();
+  renderDash(); 
+  renderHist();
+  renderProgressBar();
   toast("O'chirildi");
 }
 
@@ -1010,7 +1057,9 @@ function confirmClear() {
   closeModal('modal-clear');
   entries = [];
   saveLocal();
-  renderDash(); renderHist();
+  renderDash(); 
+  renderHist();
+  renderProgressBar();
   toast('Tozalandi');
 }
 
@@ -1022,20 +1071,18 @@ document.querySelectorAll('.modal-backdrop').forEach(el => {
   el.addEventListener('click', e => { if (e.target===el) closeModal(el.id); });
 });
 
-document.getElementById('budget-pin-input').addEventListener('keydown', e => {
-  if (e.key==='Enter') confirmBudgetPin();
-});
-
 // ── ENTRY HTML ────────────────────────────
 function entryHTML(e, allowContext = false) {
-  const c = CATS[e.cat]||CATS.boshqa;
-  const contextAttr = allowContext ? `data-entry-id="${e.id}" class="entry-card clickable"` : 'class="entry-card"';
+  const cats = e.type === 'income' ? INCOME_CATS : EXPENSE_CATS;
+  const c = cats[e.cat] || cats.boshqa;
+  const typeClass = e.type === 'income' ? 'income' : 'expense';
+  const contextAttr = allowContext ? `data-entry-id="${e.id}" class="entry-card clickable ${typeClass}"` : `class="entry-card ${typeClass}"`;
   
-  // Desktop: click to show context
-  // Mobile: long press
   const contextEvent = allowContext 
     ? `onclick="handleEntryClick(${e.id}, event)" ontouchstart="handleTouchStart(${e.id})" ontouchend="handleTouchEnd()" ontouchcancel="handleTouchEnd()"`
     : '';
+  
+  const sign = e.type === 'income' ? '+' : '−';
   
   return `<div ${contextAttr} ${contextEvent}>
     <div class="entry-ico ${c.ic}">${c.ico}</div>
@@ -1044,49 +1091,47 @@ function entryHTML(e, allowContext = false) {
       <div class="entry-meta">${dateLabel(e.date)} · ${c.label}</div>
     </div>
     <div class="entry-right">
-      <div class="entry-amt">${fmtFull(e.amount)}</div>
+      <div class="entry-amt ${typeClass}">${sign}${fmtFull(e.amount)}</div>
     </div>
   </div>`;
 }
 
 // ── RENDER DASH ───────────────────────────
 function renderDash() {
-  const total = entries.reduce((s,e)=>s+e.amount,0);
-  document.getElementById('h-total').textContent = fmtFull(total)+' UZS';
-  document.getElementById('h-count').textContent = entries.length;
+  const income = entries.filter(e=>e.type==='income').reduce((s,e)=>s+e.amount,0);
+  const expense = entries.filter(e=>e.type==='expense').reduce((s,e)=>s+e.amount,0);
+  const balance = income - expense;
+  
+  document.getElementById('h-balance').textContent = fmtFull(balance)+' UZS';
+  document.getElementById('h-income').textContent = fmt(income);
+  document.getElementById('h-expense').textContent = fmt(expense);
 
-  if (budget) {
-    const rem = budget - total;
-    document.getElementById('h-remain').textContent = fmt(Math.abs(rem))+(rem<0?' ↑':'')+' UZS';
-    const pct = Math.min(total/budget*100, 100);
-    document.getElementById('h-prog-fill').style.width = pct+'%';
-    document.getElementById('h-prog-lbl').textContent  = 'Byudjet: '+fmt(budget)+' UZS';
-    document.getElementById('h-prog-pct').textContent  = Math.round(pct)+'%';
-  } else {
-    document.getElementById('h-remain').textContent    = '—';
-    document.getElementById('h-prog-lbl').textContent  = 'Byudjet belgilanmagan';
-    document.getElementById('h-prog-pct').textContent  = '';
-    document.getElementById('h-prog-fill').style.width = '0%';
-  }
+  const todayIncome = entries.filter(e=>e.date===today() && e.type==='income').reduce((s,e)=>s+e.amount,0);
+  const todayExpense = entries.filter(e=>e.date===today() && e.type==='expense').reduce((s,e)=>s+e.amount,0);
+  const todayNet = todayIncome - todayExpense;
+  document.getElementById('m-today').textContent = fmt(todayNet);
 
-  const todayT = entries.filter(e=>e.date===today()).reduce((s,e)=>s+e.amount,0);
-  document.getElementById('m-today').textContent = fmt(todayT);
-
+  const expenseEntries = entries.filter(e=>e.type==='expense');
   const catT={};
-  entries.forEach(e=>{ catT[e.cat]=(catT[e.cat]||0)+e.amount; });
+  expenseEntries.forEach(e=>{ catT[e.cat]=(catT[e.cat]||0)+e.amount; });
   const top = Object.entries(catT).sort((a,b)=>b[1]-a[1])[0];
-  document.getElementById('m-topcat').textContent = top ? CATS[top[0]].ico : '—';
+  document.getElementById('m-topcat').textContent = top ? EXPENSE_CATS[top[0]]?.ico || '—' : '—';
 
   const el  = document.getElementById('dash-recent');
   const rec = entries.slice(0,3);
   el.innerHTML = rec.length
     ? rec.map(e=>entryHTML(e, false)).join('')
-    : '<div class="empty-msg"><div class="big">🌱</div>Hali xarajat yo\'q</div>';
+    : '<div class="empty-msg"><div class="big">🌱</div>Hali operatsiya yo\'q</div>';
 }
 
 // ── RENDER HIST ───────────────────────────
 function renderHist() {
   let filtered = [...entries];
+  
+  // Apply type filter
+  if (filterType !== 'all') {
+    filtered = filtered.filter(e => e.type === filterType);
+  }
   
   // Apply date filter
   if (filterDateStart || filterDateEnd) {
@@ -1105,7 +1150,25 @@ function renderHist() {
   const el = document.getElementById('hist-list');
   el.innerHTML = filtered.length
     ? filtered.map(e=>entryHTML(e, true)).join('')
-    : '<div class="empty-msg"><div class="big">📋</div>Hali xarajat yo\'q</div>';
+    : '<div class="empty-msg"><div class="big">📋</div>Hali operatsiya yo\'q</div>';
+}
+
+// ── PROGRESS BAR ──────────────────────────
+function renderProgressBar() {
+  const income = entries.filter(e=>e.type==='income').reduce((s,e)=>s+e.amount,0);
+  const expense = entries.filter(e=>e.type==='expense').reduce((s,e)=>s+e.amount,0);
+  const balance = income - expense;
+  
+  document.getElementById('balance-expense-val').textContent = fmt(expense);
+  document.getElementById('balance-income-val').textContent = fmt(balance); // Show balance, not income
+  
+  const expenseBar = document.getElementById('balance-prog-expense');
+  if (income === 0) {
+    expenseBar.style.width = '0%';
+  } else {
+    const pct = Math.min((expense / income) * 100, 100);
+    expenseBar.style.width = pct + '%';
+  }
 }
 
 // ── FILTERS ───────────────────────────────
@@ -1137,11 +1200,31 @@ function clearDateFilter() {
 
 function openCatFilter() {
   const grid = document.getElementById('filter-cat-grid');
-  grid.innerHTML = Object.entries(CATS).map(([key, c]) => 
-    `<div class="cat-item ${filterCats.has(key)?'sel':''}" data-cat="${key}" onclick="toggleFilterCat('${key}')">
-      <span class="ico">${c.ico}</span>${c.label}
-    </div>`
-  ).join('');
+  let html = '';
+  
+  // Show all categories if type filter is 'all'
+  // Show only expense categories if type filter is 'expense'
+  // Show only income categories if type filter is 'income'
+  
+  if (filterType === 'all' || filterType === 'expense') {
+    html += '<div class="cat-section-header">Xarajat Kategoriyalari</div>';
+    html += Object.entries(EXPENSE_CATS).map(([key, c]) => 
+      `<div class="cat-item ${filterCats.has(key)?'sel':''}" data-cat="${key}" onclick="toggleFilterCat('${key}')">
+        <span class="ico">${c.ico}</span>${c.label}
+      </div>`
+    ).join('');
+  }
+  
+  if (filterType === 'all' || filterType === 'income') {
+    html += '<div class="cat-section-header">Daromad Kategoriyalari</div>';
+    html += Object.entries(INCOME_CATS).map(([key, c]) => 
+      `<div class="cat-item ${filterCats.has(key)?'sel':''}" data-cat="${key}" onclick="toggleFilterCat('${key}')">
+        <span class="ico">${c.ico}</span>${c.label}
+      </div>`
+    ).join('');
+  }
+  
+  grid.innerHTML = html;
   openModal('modal-cat-filter');
 }
 
@@ -1167,122 +1250,6 @@ function clearCatFilter() {
   closeModal('modal-cat-filter');
 }
 
-// ── RENDER CHART ──────────────────────────
-function renderChart() {
-  const canvas = document.getElementById('monthChart');
-  const ctx = canvas.getContext('2d');
-  canvas.width = canvas.offsetWidth * 2;
-  canvas.height = canvas.offsetHeight * 2;
-  ctx.scale(2, 2);
-  
-  const w = canvas.offsetWidth;
-  const h = canvas.offsetHeight;
-  
-  ctx.clearRect(0, 0, w, h);
-  
-  if (entries.length === 0) {
-    ctx.fillStyle = '#ADA89F';
-    ctx.font = '12px Nunito';
-    ctx.textAlign = 'center';
-    ctx.fillText('Hali xarajat yo\'q', w/2, h/2);
-    return;
-  }
-  
-  // Get current month entries only
-  const today = new Date();
-  const currentMonth = today.getMonth();
-  const currentYear = today.getFullYear();
-  
-  const monthEntries = entries.filter(e => {
-    const d = new Date(e.date);
-    return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
-  });
-  
-  if (monthEntries.length === 0) {
-    ctx.fillStyle = '#ADA89F';
-    ctx.font = '12px Nunito';
-    ctx.textAlign = 'center';
-    ctx.fillText('Bu oyda hali xarajat yo\'q', w/2, h/2);
-    return;
-  }
-  
-  // Find first entry date in this month
-  const dates = monthEntries.map(e => new Date(e.date));
-  const firstDate = new Date(Math.min(...dates));
-  const firstDay = firstDate.getDate();
-  const todayDay = today.getDate();
-  
-  // Calculate days to show (from first entry to today)
-  const daysToShow = todayDay - firstDay + 1;
-  
-  if (daysToShow <= 0) {
-    ctx.fillStyle = '#ADA89F';
-    ctx.font = '12px Nunito';
-    ctx.textAlign = 'center';
-    ctx.fillText('Ma\'lumot yo\'q', w/2, h/2);
-    return;
-  }
-  
-  // Build daily data
-  const dailyData = [];
-  for (let i = 0; i < daysToShow; i++) {
-    const day = firstDay + i;
-    const d = new Date(currentYear, currentMonth, day);
-    const dateStr = d.toISOString().slice(0,10);
-    const dayTotal = monthEntries.filter(e => e.date === dateStr).reduce((s,e)=>s+e.amount, 0);
-    dailyData.push({ day: day, total: dayTotal });
-  }
-  
-  const maxTotal = Math.max(...dailyData.map(d=>d.total), 1);
-  const barW = (w - 40) / daysToShow;
-  const chartH = h - 40;
-  
-  dailyData.forEach((d, i) => {
-    const barH = (d.total / maxTotal) * chartH;
-    const x = 20 + i * barW;
-    const y = h - 20 - barH;
-    
-    ctx.fillStyle = '#4A7C59';
-    ctx.fillRect(x, y, Math.max(barW - 4, 2), barH);
-    
-    // Day label (show every 3rd day if too many)
-    if (daysToShow <= 10 || i % 3 === 0) {
-      ctx.fillStyle = '#7C776F';
-      ctx.font = '10px Nunito';
-      ctx.textAlign = 'center';
-      ctx.fillText(d.day, x + barW/2 - 2, h - 5);
-    }
-  });
-}
-
-// ── MONTH RESET ───────────────────────────
-function checkMonthReset() {
-  const today = new Date();
-  const currentMonthKey = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}`;
-  
-  // If it's the 1st of the month and we haven't reset yet
-  if (today.getDate() === 1 && chartResetMonth !== currentMonthKey) {
-    openModal('modal-month-reset');
-  }
-}
-
-function confirmMonthReset() {
-  const today = new Date();
-  const currentMonthKey = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}`;
-  
-  chartResetMonth = currentMonthKey;
-  localStorage.setItem('x_chart_reset', chartResetMonth);
-  
-  closeModal('modal-month-reset');
-  renderChart();
-  toast('✓ Diagramma yangilandi');
-}
-
-function skipMonthReset() {
-  closeModal('modal-month-reset');
-  toast('Keyinroq yangilashingiz mumkin');
-}
-
 // ── TOAST ─────────────────────────────────
 let toastT;
 function toast(msg) {
@@ -1298,9 +1265,6 @@ function tick() {
   const n=new Date();
   const t=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');
   document.getElementById('clock-disp').textContent=t;
-  if (document.getElementById('modal-budget-pin').classList.contains('open')) {
-    document.getElementById('budget-pin-show').textContent = getTimePin();
-  }
 }
 tick();
 setInterval(tick, 10000);
@@ -1318,8 +1282,8 @@ document.addEventListener('click', e => {
 });
 
 // ── INIT ──────────────────────────────────
+renderCategoryGrid();
 loadLocal();
-updateBudgetDisplay();
 </script>
 
 <script>
